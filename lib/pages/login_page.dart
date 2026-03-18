@@ -7,9 +7,9 @@ class LoginPage extends StatelessWidget {
   // TextFieldListeners
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
-  final void Function() onTap;
+  final void Function() onPressed;
 
-  LoginPage({super.key, required this.onTap});
+  LoginPage({super.key, required this.onPressed});
 
   // Login Function
   void loginFunction(BuildContext context) async {
@@ -50,14 +50,6 @@ class LoginPage extends StatelessWidget {
 
             SizedBox(height: 30),
 
-            // welcome
-            Text(
-              "Welcome Back",
-              style: TextStyle(color: Theme.of(context).colorScheme.primary),
-            ),
-
-            SizedBox(height: 30),
-
             // username / email textfield
             CustomTextfield(
               hintText: 'Email',
@@ -74,40 +66,40 @@ class LoginPage extends StatelessWidget {
               textController: _passController,
             ),
 
-            SizedBox(height: 5),
-
-            // register now textbutton
-            Padding(
-              padding: const EdgeInsets.only(right: 35.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    'Don\'t have an account? ',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: onTap,
-                    child: Text(
-                      'Sign up',
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            SizedBox(height: 25),
+            SizedBox(height: 10),
 
             // login button
             CustomButton(
               textButton: 'LOGIN',
               onTap: () => loginFunction(context),
+            ),
+
+            SizedBox(height: 15),
+
+            // Google sign in
+            GestureDetector(
+              onTap: () async {
+                print('google sign in pressed');
+                await AuthService().signInGoogle();
+              },
+              child: SizedBox(
+                height: 50,
+                width: 50,
+                child: Image(image: AssetImage('assets/google_icon.png')),
+              ),
+            ),
+
+            // register now textbutton
+            TextButton(
+              onPressed: onPressed,
+              child: Text(
+                'Not Registered?',
+                style: TextStyle(
+                  color: Color(0xFF0084FF),
+                  decoration: TextDecoration.underline,
+                  decorationColor: Color(0xFF0084FF),
+                ),
+              ),
             ),
           ],
         ),

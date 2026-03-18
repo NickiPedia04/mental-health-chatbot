@@ -9,9 +9,9 @@ class RegisterPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passController = TextEditingController();
   final TextEditingController _confirmPassController = TextEditingController();
-  final void Function() onTap;
+  final void Function() onPressed;
 
-  RegisterPage({super.key, required this.onTap});
+  RegisterPage({super.key, required this.onPressed});
 
   void registerFunction(BuildContext context) {
     // Register
@@ -57,14 +57,6 @@ class RegisterPage extends StatelessWidget {
 
             SizedBox(height: 30),
 
-            // welcome
-            Text(
-              "Welcome Back",
-              style: TextStyle(color: Theme.of(context).colorScheme.primary),
-            ),
-
-            SizedBox(height: 30),
-
             // username textfield
             CustomTextfield(
               hintText: 'Username',
@@ -98,40 +90,41 @@ class RegisterPage extends StatelessWidget {
               obscureText: true,
               textController: _confirmPassController,
             ),
-            SizedBox(height: 5),
 
-            // Login page textbutton
-            Padding(
-              padding: const EdgeInsets.only(right: 35),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(
-                    'Already registered? ',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: onTap,
-                    child: Text(
-                      'Sign In',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            SizedBox(height: 10),
 
-            SizedBox(height: 18),
-
-            // login button
+            // register button
             CustomButton(
               textButton: 'REGISTER',
               onTap: () => registerFunction(context),
+            ),
+
+            SizedBox(height: 15),
+
+            // Google sign in
+            GestureDetector(
+              onTap: () async {
+                print('google sign in pressed');
+                await AuthService().signInGoogle();
+              },
+              child: SizedBox(
+                height: 50,
+                width: 50,
+                child: Image(image: AssetImage('assets/google_icon.png')),
+              ),
+            ),
+
+            // login now textbutton
+            TextButton(
+              onPressed: onPressed,
+              child: Text(
+                'Already Registered?',
+                style: TextStyle(
+                  color: Color(0xFF0084FF),
+                  decoration: TextDecoration.underline,
+                  decorationColor: Color(0xFF0084FF),
+                ),
+              ),
             ),
           ],
         ),

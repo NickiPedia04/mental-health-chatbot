@@ -12,7 +12,20 @@
           "package_name": "com.example.mental_app_support"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "644908706342-c71cdv5ouf4r7aa6ro1qq0e8pm224vrb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mental_app_support",
+            "certificate_hash": "601fbbbb76de5e9ef481aac0db0ec844af6ade37"
+          }
+        },
+        {
+          "client_id": "644908706342-vv58e9rtakubkhomj9nr6elqqfclvuvf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCpnAF6GHGLC5yIlO-hAKuMBTAo0XyfZPw"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "644908706342-vv58e9rtakubkhomj9nr6elqqfclvuvf.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "644908706342-vqq1re8sk2cur6cmth3kqbltc6n25lgp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.mentalAppSupport"
+              }
+            }
+          ]
         }
       }
     }
