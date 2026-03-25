@@ -76,6 +76,7 @@ class AuthService {
       return userCred.user;
     } catch (e) {
       print("Erorr: $e");
+      return null;
     }
   }
 }
