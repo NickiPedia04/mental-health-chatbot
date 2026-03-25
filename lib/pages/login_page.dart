@@ -79,7 +79,7 @@ class LoginPage extends StatelessWidget {
             // Google sign in
             GestureDetector(
               onTap: () async {
-                print('google sign in pressed');
+                // print('google sign in pressed');
                 await AuthService().signInGoogle();
               },
               child: SizedBox(

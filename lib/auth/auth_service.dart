@@ -52,24 +52,30 @@ class AuthService {
   // google sign in
   Future<User?> signInGoogle() async {
     try {
-      // initiate google sign in pop up
-      final GoogleSignInAccount googleUser = await GoogleSignIn.instance
-          .authenticate();
+      print('Initializing Google Sign In');
 
-      // req auth detail
-      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+      final googleSignIn = GoogleSignIn.instance;
 
-      // create user's new credentials
-      final OAuthCredential cred = GoogleAuthProvider.credential(
+      await googleSignIn.initialize(
+        serverClientId:
+            '644908706342-vv58e9rtakubkhomj9nr6elqqfclvuvf.apps.googleusercontent.com',
+      );
+
+      final googleUser = await googleSignIn.authenticate();
+
+      final googleAuth = googleUser.authentication;
+
+      final googleCred = GoogleAuthProvider.credential(
         idToken: googleAuth.idToken,
       );
 
-      // sign in with google acc
-      final UserCredential userCred = await _auth.signInWithCredential(cred);
+      final userCred = await _auth.signInWithCredential(googleCred);
+
+      print('Success: $userCred');
 
       return userCred.user;
     } catch (e) {
-      return null;
+      print("Erorr: $e");
     }
   }
 }
