@@ -4,33 +4,43 @@ import 'package:mental_app_support/components/custom_button.dart';
 import 'package:mental_app_support/components/custom_password_textfield.dart';
 import 'package:mental_app_support/components/custom_textfield.dart';
 
-class RegisterPage extends StatelessWidget {
-  // TextFieldListeners
-  final TextEditingController _usernameController = TextEditingController();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passController = TextEditingController();
-  final TextEditingController _confirmPassController = TextEditingController();
+class RegisterPage extends StatefulWidget {
   final void Function() onPressed;
 
-  RegisterPage({super.key, required this.onPressed});
+  const RegisterPage({super.key, required this.onPressed});
 
-  void registerFunction(BuildContext context) {
+  @override
+  State<RegisterPage> createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  // TextFieldListeners
+  final TextEditingController _usernameController = TextEditingController();
+
+  final TextEditingController _emailController = TextEditingController();
+
+  final TextEditingController _passController = TextEditingController();
+
+  final TextEditingController _confirmPassController = TextEditingController();
+
+  void registerFunction(BuildContext context) async {
     // Register
     final _auth = AuthService();
 
     // pass matched, then register
     if (_passController.text == _confirmPassController.text) {
-      try {} catch (e) {
+      try {
+        await _auth.signUpUsernameEmailPassword(
+          _usernameController.text,
+          _emailController.text,
+          _passController.text,
+        );
+      } catch (e) {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(title: Text(e.toString())),
         );
       }
-      _auth.signUpUsernameEmailPassword(
-        _usernameController.text,
-        _emailController.text,
-        _passController.text,
-      );
     }
     // pass don't match, show error to match the pass
     else {
@@ -137,7 +147,7 @@ class RegisterPage extends StatelessWidget {
 
             // login now textbutton
             TextButton(
-              onPressed: onPressed,
+              onPressed: widget.onPressed,
               child: Text(
                 'Already Registered?',
                 style: TextStyle(

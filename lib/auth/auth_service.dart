@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthService {
   // instance
@@ -38,6 +39,10 @@ class AuthService {
         password: password,
       );
 
+      await addUserDetails(username, email);
+
+      print('user details contains: $username and $email');
+
       return userCred;
     } on FirebaseAuthException catch (e) {
       throw Exception(e.code);
@@ -71,6 +76,11 @@ class AuthService {
 
       final userCred = await _auth.signInWithCredential(googleCred);
 
+      await addUserDetails(
+        userCred.user!.displayName ?? 'No Name',
+        userCred.user!.email ?? '',
+      );
+
       print('Success: $userCred');
 
       return userCred.user;
@@ -78,5 +88,22 @@ class AuthService {
       print("Erorr: $e");
       return null;
     }
+  }
+
+  Future<void> addUserDetails(String username, String email) async {
+    final user = _auth.currentUser;
+
+    print(user?.uid);
+
+    if (user == null) return;
+
+    final db = FirebaseFirestore.instance;
+
+    await db.collection('user-details').doc(user.uid).set({
+      "email": email,
+      "username": username,
+    });
+
+    print('user saved to firestore');
   }
 }
