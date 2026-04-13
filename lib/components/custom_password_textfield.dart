@@ -4,9 +4,8 @@ class CustomPasswordTextfield extends StatefulWidget {
   final String hintText;
   final TextEditingController textController;
   final double horzonPadding;
-  bool obscured = true;
 
-  CustomPasswordTextfield({
+  const CustomPasswordTextfield({
     super.key,
     required this.hintText,
     required this.textController,
@@ -18,13 +17,14 @@ class CustomPasswordTextfield extends StatefulWidget {
 }
 
 class _CustomPasswordTextfield extends State<CustomPasswordTextfield> {
+  bool obscured = true;
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: widget.horzonPadding),
       child: TextField(
         controller: widget.textController,
-        obscureText: widget.obscured ? true : false,
+        obscureText: obscured ? true : false,
         decoration: InputDecoration(
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(5),
@@ -51,10 +51,10 @@ class _CustomPasswordTextfield extends State<CustomPasswordTextfield> {
             child: IconButton(
               onPressed: () => {
                 setState(() {
-                  widget.obscured = !widget.obscured;
+                  obscured = obscured;
                 }),
               },
-              icon: widget.obscured
+              icon: obscured
                   ? Icon(Icons.visibility_off)
                   : Icon(Icons.visibility),
             ),

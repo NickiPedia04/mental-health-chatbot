@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mental_app_support/auth/login_or_register.dart';
-import 'package:mental_app_support/pages/home_page.dart';
 import 'package:mental_app_support/widgets/custom_navBottomBar.dart';
 
 class AuthGate extends StatelessWidget {

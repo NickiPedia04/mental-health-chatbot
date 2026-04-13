@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mental_app_support/auth/auth_service.dart';
 import 'package:mental_app_support/components/custom_button.dart';
-import 'package:mental_app_support/components/custom_passwordTextfield.dart';
+import 'package:mental_app_support/components/custom_password_textfield.dart';
 import 'package:mental_app_support/components/custom_textfield.dart';
 import 'package:mental_app_support/pages/forgot_password_page.dart';
 

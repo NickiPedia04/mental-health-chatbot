@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mental_app_support/components/custom_passwordTextfield.dart';
-import 'package:mental_app_support/components/custom_textfield.dart';
+import 'package:mental_app_support/components/custom_password_textfield.dart';
 
 class ChangePasswordPage extends StatelessWidget {
   final TextEditingController _newPasswordController = TextEditingController();
