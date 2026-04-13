@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mental_app_support/auth/login_or_register.dart';
 import 'package:mental_app_support/pages/home_page.dart';
+import 'package:mental_app_support/widgets/custom_navBottomBar.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
@@ -14,7 +15,7 @@ class AuthGate extends StatelessWidget {
         builder: (context, snapshot) {
           // user has logged in
           if (snapshot.hasData) {
-            return HomePage();
+            return CustomNavbottombar();
           }
           // user has not logged in
           else {

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mental_app_support/auth/auth_service.dart';
 import 'package:mental_app_support/components/custom_button.dart';
+import 'package:mental_app_support/components/custom_passwordTextfield.dart';
 import 'package:mental_app_support/components/custom_textfield.dart';
+import 'package:mental_app_support/pages/forgot_password_page.dart';
 
 class LoginPage extends StatelessWidget {
   // TextFieldListeners
@@ -53,39 +55,88 @@ class LoginPage extends StatelessWidget {
             // username / email textfield
             CustomTextfield(
               hintText: 'Email',
-              obscureText: false,
               textController: _emailController,
+              horzonPadding: 50.0,
             ),
 
             SizedBox(height: 10),
 
             // pass textfield
-            CustomTextfield(
+            CustomPasswordTextfield(
               hintText: 'Password',
-              obscureText: true,
               textController: _passController,
+              horzonPadding: 50.0,
+            ),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 53),
+                  child: GestureDetector(
+                    onTap: () async {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ForgotPasswordPage(),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      'Forgot Password?',
+                      style: TextStyle(
+                        color: Color(0xFF0084FF),
+                        fontSize: 11,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
 
             SizedBox(height: 10),
 
             // login button
             CustomButton(
-              textButton: 'LOGIN',
+              textButton: 'Sign In',
               onTap: () => loginFunction(context),
             ),
 
             SizedBox(height: 15),
 
+            Text(
+              '- - - Or Login Using - - -',
+              style: TextStyle(
+                fontSize: 15,
+                color: Theme.of(
+                  context,
+                ).colorScheme.inversePrimary.withValues(alpha: 0.4),
+              ),
+            ),
+
+            SizedBox(height: 15),
+
             // Google sign in
-            GestureDetector(
-              onTap: () async {
-                // print('google sign in pressed');
-                await AuthService().signInGoogle();
-              },
-              child: SizedBox(
-                height: 50,
-                width: 50,
-                child: Image(image: AssetImage('assets/google_icon.png')),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.inversePrimary.withValues(alpha: 0.4),
+                ),
+                borderRadius: BorderRadius.circular(5),
+              ),
+              child: GestureDetector(
+                onTap: () async {
+                  // print('google sign in pressed');
+                  await AuthService().signInGoogle();
+                },
+                child: SizedBox(
+                  height: 50,
+                  width: 50,
+                  child: Image(image: AssetImage('assets/google_icon.png')),
+                ),
               ),
             ),
 
@@ -96,8 +147,8 @@ class LoginPage extends StatelessWidget {
                 'Not Registered?',
                 style: TextStyle(
                   color: Color(0xFF0084FF),
-                  decoration: TextDecoration.underline,
-                  decorationColor: Color(0xFF0084FF),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w400,
                 ),
               ),
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mental_app_support/auth/auth_service.dart';
 import 'package:mental_app_support/components/custom_button.dart';
+import 'package:mental_app_support/components/custom_passwordTextfield.dart';
 import 'package:mental_app_support/components/custom_textfield.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -60,8 +61,8 @@ class RegisterPage extends StatelessWidget {
             // username textfield
             CustomTextfield(
               hintText: 'Username',
-              obscureText: false,
               textController: _usernameController,
+              horzonPadding: 50.0,
             ),
 
             SizedBox(height: 10),
@@ -69,34 +70,46 @@ class RegisterPage extends StatelessWidget {
             // email textfield
             CustomTextfield(
               hintText: 'Email',
-              obscureText: false,
               textController: _emailController,
+              horzonPadding: 50.0,
             ),
 
             SizedBox(height: 10),
 
             // pass textfield
-            CustomTextfield(
+            CustomPasswordTextfield(
               hintText: 'Password',
-              obscureText: true,
               textController: _passController,
+              horzonPadding: 50.0,
             ),
 
             SizedBox(height: 10),
 
             // confirm pass textfield
-            CustomTextfield(
+            CustomPasswordTextfield(
               hintText: 'Confirm password',
-              obscureText: true,
               textController: _confirmPassController,
+              horzonPadding: 50.0,
             ),
 
             SizedBox(height: 10),
 
             // register button
             CustomButton(
-              textButton: 'REGISTER',
+              textButton: 'Sign Up',
               onTap: () => registerFunction(context),
+            ),
+
+            SizedBox(height: 15),
+
+            Text(
+              '- - - Or Register Using - - -',
+              style: TextStyle(
+                fontSize: 15,
+                color: Theme.of(
+                  context,
+                ).colorScheme.inversePrimary.withValues(alpha: 0.4),
+              ),
             ),
 
             SizedBox(height: 15),
@@ -104,12 +117,20 @@ class RegisterPage extends StatelessWidget {
             // Google sign in
             GestureDetector(
               onTap: () async {
-                print('google sign in pressed');
+                // print('google sign in pressed');
                 await AuthService().signInGoogle();
               },
-              child: SizedBox(
+              child: Container(
                 height: 50,
                 width: 50,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.inversePrimary.withValues(alpha: 0.4),
+                  ),
+                  borderRadius: BorderRadius.circular(5),
+                ),
                 child: Image(image: AssetImage('assets/google_icon.png')),
               ),
             ),
@@ -121,8 +142,8 @@ class RegisterPage extends StatelessWidget {
                 'Already Registered?',
                 style: TextStyle(
                   color: Color(0xFF0084FF),
-                  decoration: TextDecoration.underline,
-                  decorationColor: Color(0xFF0084FF),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w400,
                 ),
               ),
             ),
