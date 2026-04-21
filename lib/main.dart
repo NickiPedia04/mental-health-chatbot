@@ -4,11 +4,19 @@ import 'package:mental_app_support/auth/auth_gate.dart';
 import 'package:mental_app_support/firebase_options.dart';
 import 'package:mental_app_support/pages/login_page.dart';
 import 'package:mental_app_support/themes/light_mode.dart';
+import 'package:mental_app_support/themes/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
+  // runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ThemeProvider(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -19,8 +27,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: AuthGate(),
-      // home: CustomDialog(),
-      theme: lightMode,
+      // theme: lightMode,
+      theme: Provider.of<ThemeProvider>(context).themeData,
     );
   }
 }

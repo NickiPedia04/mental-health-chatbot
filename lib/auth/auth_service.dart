@@ -90,6 +90,7 @@ class AuthService {
     }
   }
 
+  // add user's detail to firestore
   Future<void> addUserDetails(String username, String email) async {
     final user = _auth.currentUser;
 
@@ -97,13 +98,15 @@ class AuthService {
 
     if (user == null) return;
 
-    final db = FirebaseFirestore.instance;
+    final db = FirebaseFirestore.instance
+        .collection('user-details')
+        .doc(user.uid);
 
-    await db.collection('user-details').doc(user.uid).set({
-      "email": email,
-      "username": username,
-    });
+    final snapshot = await db.get();
 
-    print('user saved to firestore');
+    if (!snapshot.exists) {
+      await db.set({"email": email, "username": username});
+      print('user saved to firestore');
+    }
   }
 }

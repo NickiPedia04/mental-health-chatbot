@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mental_app_support/auth/auth_service.dart';
 import 'package:mental_app_support/components/custom_textfield.dart';
+import 'package:mental_app_support/themes/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -70,7 +72,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               height: 50,
                               width: 280,
                               decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary,
+                                color: Theme.of(context).colorScheme.secondary,
                                 borderRadius: BorderRadius.circular(5),
                               ),
                               child: Padding(
@@ -121,7 +123,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               height: 50,
                               width: 280,
                               decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary,
+                                color: Theme.of(context).colorScheme.secondary,
                                 borderRadius: BorderRadius.circular(5),
                               ),
                               child: Padding(
@@ -203,7 +205,18 @@ class _SettingsPageState extends State<SettingsPage> {
 
 class ChangeUsernameDialog extends StatelessWidget {
   final currUser = FirebaseAuth.instance.currentUser;
+  final userDetailsCollection = FirebaseFirestore.instance.collection(
+    "user-details",
+  );
   final TextEditingController _newUsernameController = TextEditingController();
+
+  void usernameUpdate() async {
+    if (_newUsernameController.toString().isNotEmpty) {
+      await userDetailsCollection.doc(currUser!.uid).update({
+        "username": _newUsernameController.text.trim(),
+      });
+    }
+  }
 
   ChangeUsernameDialog({super.key});
 
@@ -217,13 +230,12 @@ class ChangeUsernameDialog extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           final userDetails = snapshot.data!.data() as Map<String, dynamic>;
-
           return Dialog(
             child: Container(
               width: 310,
               height: 170,
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(5),
               ),
               child: Padding(
@@ -237,7 +249,10 @@ class ChangeUsernameDialog extends StatelessWidget {
                       children: [
                         Text(
                           "New Username",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).colorScheme.tertiary,
+                          ),
                         ),
                       ],
                     ),
@@ -273,19 +288,25 @@ class ChangeUsernameDialog extends StatelessWidget {
                             ),
                           ),
                         ),
-                        Container(
-                          width: 125,
-                          height: 51,
-                          decoration: BoxDecoration(
-                            color: Colors.green,
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Center(
-                            child: Text(
-                              'Confirm',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                        GestureDetector(
+                          onTap: () {
+                            usernameUpdate();
+                            Navigator.of(context).pop();
+                          },
+                          child: Container(
+                            width: 125,
+                            height: 51,
+                            decoration: BoxDecoration(
+                              color: Colors.green,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Confirm',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
@@ -308,18 +329,15 @@ class ChangeUsernameDialog extends StatelessWidget {
 }
 
 class ChangeThemeDialog extends StatelessWidget {
-  final currUser = FirebaseAuth.instance.currentUser;
-
-  ChangeThemeDialog({super.key});
-
   @override
   Widget build(BuildContext context) {
+    final isDark = Provider.of<ThemeProvider>(context).isDarkMode;
     return Dialog(
       child: Container(
         width: 310,
         height: 240,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(5),
         ),
         child: Padding(
@@ -328,60 +346,100 @@ class ChangeThemeDialog extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Text("Theme", style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(
+                    "Theme",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.tertiary,
+                    ),
+                  ),
                 ],
               ),
 
               SizedBox(height: 10),
 
-              Container(
-                width: 277,
-                height: 50,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.primary,
+              // Light Mode
+              GestureDetector(
+                onTap: () {
+                  if (isDark) {
+                    Provider.of<ThemeProvider>(
+                      context,
+                      listen: false,
+                    ).toggleTheme();
+                  }
+                },
+                child: Container(
+                  width: 277,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                    color: Theme.of(context).colorScheme.secondary,
+                    borderRadius: BorderRadius.circular(5),
                   ),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Light',
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      SizedBox(),
-                      Icon(Icons.radio_button_checked, size: 17),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Light',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        SizedBox(),
+                        Icon(
+                          !isDark
+                              ? Icons.radio_button_checked
+                              : Icons.radio_button_off,
+                          size: 17,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
 
               SizedBox(height: 10),
 
-              Container(
-                width: 277,
-                height: 50,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.primary,
+              // Dark Mode
+              GestureDetector(
+                onTap: () {
+                  if (!isDark) {
+                    Provider.of<ThemeProvider>(
+                      context,
+                      listen: false,
+                    ).toggleTheme();
+                  }
+                },
+                child: Container(
+                  width: 277,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                    color: Theme.of(context).colorScheme.secondary,
+                    borderRadius: BorderRadius.circular(5),
                   ),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Dark',
-                        style: TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                      SizedBox(),
-                      Icon(Icons.radio_button_off, size: 17),
-                    ],
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Dark',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        SizedBox(),
+                        Icon(
+                          isDark
+                              ? Icons.radio_button_checked
+                              : Icons.radio_button_off,
+                          size: 17,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
