@@ -70,7 +70,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
             // username textfield
             CustomTextfield(
-              hintText: 'Username',
+              hintText: 'Name',
               textController: _usernameController,
               horzonPadding: 50.0,
             ),
@@ -79,7 +79,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
             // email textfield
             CustomTextfield(
-              hintText: 'Email',
+              hintText: 'email@example.com',
               textController: _emailController,
               horzonPadding: 50.0,
             ),

@@ -2,8 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:mental_app_support/auth/auth_gate.dart';
 import 'package:mental_app_support/firebase_options.dart';
-import 'package:mental_app_support/pages/login_page.dart';
-import 'package:mental_app_support/themes/light_mode.dart';
+import 'package:mental_app_support/pages/otp_page.dart';
 import 'package:mental_app_support/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -27,7 +26,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: AuthGate(),
-      // theme: lightMode,
       theme: Provider.of<ThemeProvider>(context).themeData,
     );
   }

@@ -1,8 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mental_app_support/auth/auth_service.dart';
+import 'package:mental_app_support/pages/change_password_page.dart';
 
-class OtpPage extends StatelessWidget {
-  const OtpPage({super.key});
+class OtpPage extends StatefulWidget {
+  final String reqEmail;
+  const OtpPage({super.key, required this.reqEmail});
+
+  @override
+  State<OtpPage> createState() => _OtpPageState();
+}
+
+class _OtpPageState extends State<OtpPage> {
+  final List<TextEditingController> pin = List.generate(
+    5,
+    (_) => TextEditingController(),
+  );
+
+  String combineOtp() {
+    return pin.map((p) => p.text).join();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,13 +57,13 @@ class OtpPage extends StatelessWidget {
                       child: TextFormField(
                         textAlignVertical: TextAlignVertical.center,
                         showCursor: false,
+                        controller: pin[0],
                         onChanged: (value) {
                           if (value.length == 1) {
                             FocusScope.of(context).nextFocus();
                           }
                         },
                         decoration: InputDecoration(
-                          contentPadding: EdgeInsets.zero,
                           hintText: "x",
                           hintStyle: TextStyle(
                             color: Theme.of(
@@ -81,6 +98,7 @@ class OtpPage extends StatelessWidget {
                       child: TextFormField(
                         textAlignVertical: TextAlignVertical.center,
                         showCursor: false,
+                        controller: pin[1],
                         onChanged: (value) {
                           if (value.length == 1) {
                             FocusScope.of(context).nextFocus();
@@ -123,6 +141,7 @@ class OtpPage extends StatelessWidget {
                       child: TextFormField(
                         textAlignVertical: TextAlignVertical.center,
                         showCursor: false,
+                        controller: pin[2],
                         onChanged: (value) {
                           if (value.length == 1) {
                             FocusScope.of(context).nextFocus();
@@ -165,6 +184,7 @@ class OtpPage extends StatelessWidget {
                       child: TextFormField(
                         textAlignVertical: TextAlignVertical.center,
                         showCursor: false,
+                        controller: pin[3],
                         onChanged: (value) {
                           if (value.length == 1) {
                             FocusScope.of(context).nextFocus();
@@ -206,6 +226,7 @@ class OtpPage extends StatelessWidget {
                       width: 50,
                       child: TextFormField(
                         showCursor: false,
+                        controller: pin[4],
                         onChanged: (value) {
                           if (value.isEmpty) {
                             FocusScope.of(context).previousFocus();
@@ -244,61 +265,153 @@ class OtpPage extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: 5),
+              SizedBox(height: 7),
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    "Resend Code ",
-                    style: TextStyle(fontSize: 11, color: Color(0xFF0084FF)),
+                  RichText(
+                    text: TextSpan(
+                      text: "Resend Code",
+                      style: TextStyle(fontSize: 11, color: Color(0xFF0084FF)),
+                      children: [
+                        TextSpan(
+                          text: " to ${widget.reqEmail} after XX:XX",
+                          style: TextStyle(fontSize: 11, color: Colors.black),
+                        ),
+                      ],
+                    ),
                   ),
-                  Text("after XX:XX", style: TextStyle(fontSize: 11)),
                 ],
               ),
 
-              SizedBox(height: 5),
+              SizedBox(height: 7),
 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      width: 125,
-                      height: 51,
-                      decoration: BoxDecoration(
-                        color: Color(0xFFFF2020),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Cancel',
-                          style: TextStyle(
-                            color: Color(0xffffffff),
-                            fontWeight: FontWeight.w600,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        width: 125,
+                        height: 51,
+                        decoration: BoxDecoration(
+                          color: Color(0xFFFF2020),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(
+                              color: Color(0xffffffff),
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                    Container(
-                      width: 125,
-                      height: 51,
-                      decoration: BoxDecoration(
-                        color: Color(0xff2ED53C),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Confirm',
-                          style: TextStyle(
-                            color: Color(0xffffffff),
-                            fontWeight: FontWeight.w600,
+                    GestureDetector(
+                      onTap: () async {
+                        final otp = combineOtp();
+                        final isValid = await AuthService().verifyOTP(
+                          widget.reqEmail,
+                          otp,
+                        );
+
+                        if (isValid) {
+                          showDialog(
+                            // ignore: use_build_context_synchronously
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) => ResetPasswordLinkSentDialog(),
+                          );
+                        } else {
+                          showDialog(
+                            // ignore: use_build_context_synchronously
+                            context: context,
+                            builder: (context) =>
+                                AlertDialog(title: Text('Otp not valid')),
+                          );
+                        }
+                      },
+                      child: Container(
+                        width: 125,
+                        height: 51,
+                        decoration: BoxDecoration(
+                          color: Color(0xff2ED53C),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Confirm',
+                            style: TextStyle(
+                              color: Color(0xffffffff),
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class ResetPasswordLinkSentDialog extends StatelessWidget {
+  const ResetPasswordLinkSentDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        width: 310,
+        height: 145,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Column(
+            children: [
+              Text(
+                "Password reset link has been sent to your email",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
+              ),
+
+              SizedBox(height: 10),
+
+              GestureDetector(
+                onTap: () {
+                  Navigator.popUntil(context, (route) => route.isFirst);
+                },
+                child: Container(
+                  width: 245,
+                  height: 51,
+                  decoration: BoxDecoration(
+                    color: Color(0xFF2ED53C),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Confirm',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],

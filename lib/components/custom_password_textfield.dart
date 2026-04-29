@@ -51,7 +51,7 @@ class _CustomPasswordTextfield extends State<CustomPasswordTextfield> {
             child: IconButton(
               onPressed: () => {
                 setState(() {
-                  obscured = obscured;
+                  obscured = !obscured;
                 }),
               },
               icon: obscured

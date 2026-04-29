@@ -1,10 +1,42 @@
+import 'dart:math';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mental_app_support/auth/auth_service.dart';
 import 'package:mental_app_support/components/custom_textfield.dart';
+import 'package:mental_app_support/pages/otp_page.dart';
 
 class ForgotPasswordPage extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
-
+  final authServ = AuthService();
+  final user = FirebaseAuth.instance.currentUser;
+  final db = FirebaseFirestore.instance.collection('user-details').doc();
   ForgotPasswordPage({super.key});
+
+  String generateOTP() {
+    final random = Random();
+    return (10000 + random.nextInt(90000)).toString();
+  }
+
+  void goToOTP(BuildContext context) async {
+    if (_emailController.toString().isNotEmpty) {
+      try {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OtpPage(reqEmail: _emailController.text),
+          ),
+        );
+      } catch (e) {
+        showDialog(
+          // ignore: use_build_context_synchronously
+          context: context,
+          builder: (context) => AlertDialog(title: Text(e.toString())),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,36 +76,71 @@ class ForgotPasswordPage extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      width: 125,
-                      height: 51,
-                      decoration: BoxDecoration(
-                        color: Color(0xFFFF2020),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Cancel',
-                          style: TextStyle(
-                            color: Color(0xffffffff),
-                            fontWeight: FontWeight.w600,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        width: 125,
+                        height: 51,
+                        decoration: BoxDecoration(
+                          color: Color(0xFFFF2020),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(
+                              color: Color(0xffffffff),
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                    Container(
-                      width: 125,
-                      height: 51,
-                      decoration: BoxDecoration(
-                        color: Color(0xff2ED53C),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Confirm',
-                          style: TextStyle(
-                            color: Color(0xffffffff),
-                            fontWeight: FontWeight.w600,
+                    GestureDetector(
+                      onTap: () async {
+                        final isEmailExist = AuthService().verifyEmail(
+                          _emailController.text,
+                        );
+
+                        if (await isEmailExist) {
+                          // ignore: use_build_context_synchronously
+                          goToOTP(context);
+                          AuthService().storeOTP(
+                            _emailController.text,
+                            generateOTP(),
+                          );
+                          // AuthService().sendEmail(
+                          //   userName: userName,
+                          //   userEmail: _emailController.text,
+                          //   otp: generateOTP(),
+                          //   endTime: endTime
+                          // )
+                        } else {
+                          showDialog(
+                            // ignore: use_build_context_synchronously
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: Text('Email not registered'),
+                            ),
+                          );
+                        }
+                      },
+                      child: Container(
+                        width: 125,
+                        height: 51,
+                        decoration: BoxDecoration(
+                          color: Color(0xff2ED53C),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Confirm',
+                            style: TextStyle(
+                              color: Color(0xffffffff),
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),

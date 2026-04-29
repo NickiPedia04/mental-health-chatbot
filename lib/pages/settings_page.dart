@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mental_app_support/auth/auth_service.dart';
+import 'package:mental_app_support/components/custom_password_textfield.dart';
 import 'package:mental_app_support/components/custom_textfield.dart';
 import 'package:mental_app_support/themes/theme_provider.dart';
 import 'package:provider/provider.dart';
@@ -18,186 +19,235 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: StreamBuilder<DocumentSnapshot>(
-        stream: FirebaseFirestore.instance
-            .collection('user-details')
-            .doc(currUser!.uid)
-            .snapshots(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final userDetails = snapshot.data!.data() as Map<String, dynamic>;
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        body: StreamBuilder<DocumentSnapshot>(
+          stream: FirebaseFirestore.instance
+              .collection('user-details')
+              .doc(currUser!.uid)
+              .snapshots(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              final userDetails = snapshot.data!.data() as Map<String, dynamic>;
 
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(0, 125, 0, 0),
-              child: Center(
-                child: Column(
-                  children: [
-                    Container(
-                      height: 100,
-                      width: 100,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        shape: BoxShape.circle,
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(0, 100, 0, 0),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 100,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary,
+                          shape: BoxShape.circle,
+                        ),
                       ),
-                    ),
-                    Text(userDetails['username']),
-                    Text(userDetails['email']),
+                      Text(userDetails['username']),
+                      Text(userDetails['email']),
 
-                    SizedBox(height: 50),
+                      SizedBox(height: 50),
 
-                    SizedBox(
-                      height: 170,
-                      width: 280,
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                'Account',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (context) => ChangeUsernameDialog(),
-                              );
-                            },
-                            child: Container(
-                              height: 50,
-                              width: 280,
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.secondary,
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 13,
+                      SizedBox(
+                        height: 250,
+                        width: 280,
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  'Account',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Change Username',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
+                              ],
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (context) => ChangeUsernameDialog(),
+                                );
+                              },
+                              child: Container(
+                                height: 50,
+                                width: 280,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.secondary,
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 13,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Change Name',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      '>',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
+                                      Text(
+                                        '>',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
 
-                          SizedBox(height: 10),
-
-                          Row(
-                            children: [
-                              Text(
-                                'Preferences',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                barrierDismissible: false,
-                                builder: (context) => ChangeThemeDialog(),
-                              );
-                            },
-                            child: Container(
-                              height: 50,
-                              width: 280,
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.secondary,
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 13,
+                            SizedBox(height: 10),
+                            GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (context) => ChangePasswordDialog(),
+                                );
+                              },
+                              child: Container(
+                                height: 50,
+                                width: 280,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.secondary,
+                                  borderRadius: BorderRadius.circular(5),
                                 ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Theme',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 13,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Change Password',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
-                                    Text(
-                                      '>',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
+                                      Text(
+                                        '>',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          SizedBox(height: 10),
-                        ],
+
+                            SizedBox(height: 10),
+
+                            Row(
+                              children: [
+                                Text(
+                                  'Preferences',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => ChangeThemeDialog(),
+                                );
+                              },
+                              child: Container(
+                                height: 50,
+                                width: 280,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.secondary,
+                                  borderRadius: BorderRadius.circular(5),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 13,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        'Theme',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Text(
+                                        '>',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                          ],
+                        ),
                       ),
-                    ),
 
-                    Spacer(),
+                      Spacer(),
 
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 15),
-                      child: GestureDetector(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            barrierDismissible: false,
-                            builder: (context) => logOutDialog(),
-                          );
-                        },
-                        child: Container(
-                          height: 50,
-                          width: 280,
-                          decoration: BoxDecoration(
-                            color: Color(0xFFFF0000),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Center(
-                            child: Text(
-                              'Log Out',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 15),
+                        child: GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => LogOutDialog(),
+                            );
+                          },
+                          child: Container(
+                            height: 50,
+                            width: 280,
+                            decoration: BoxDecoration(
+                              color: Color(0xFFFF0000),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Log Out',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            );
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error${snapshot.error.toString()}'));
-          }
+              );
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error${snapshot.error.toString()}'));
+            }
 
-          return const Center(child: CircularProgressIndicator());
-        },
+            return const Center(child: CircularProgressIndicator());
+          },
+        ),
       ),
     );
   }
@@ -328,10 +378,149 @@ class ChangeUsernameDialog extends StatelessWidget {
   }
 }
 
+class ChangePasswordDialog extends StatelessWidget {
+  final userDetailsCollection = FirebaseFirestore.instance.collection(
+    "user-details",
+  );
+  final TextEditingController _newPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+
+  ChangePasswordDialog({super.key});
+
+  void changePassFunction(BuildContext context) async {
+    final currUser = FirebaseAuth.instance.currentUser;
+
+    if (_newPasswordController.text == _confirmPasswordController.text) {
+      try {
+        await currUser!.updatePassword(_newPasswordController.text.trim());
+      } catch (e) {
+        showDialog(
+          // ignore: use_build_context_synchronously
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Please re-login before changing password'),
+          ),
+        );
+      }
+    } else {
+      showDialog(
+        // ignore: use_build_context_synchronously
+        context: context,
+        builder: (context) => AlertDialog(title: Text('Pass don\'t match')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        width: 310,
+        height: 235,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Text(
+                    "Change Password",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.tertiary,
+                    ),
+                  ),
+                ],
+              ),
+
+              SizedBox(height: 10),
+
+              CustomPasswordTextfield(
+                hintText: 'New Password',
+                textController: _newPasswordController,
+                horzonPadding: 0,
+              ),
+
+              SizedBox(height: 10),
+
+              CustomPasswordTextfield(
+                hintText: 'Confirm Password',
+                textController: _confirmPasswordController,
+                horzonPadding: 0,
+              ),
+
+              SizedBox(height: 10),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Container(
+                      width: 125,
+                      height: 51,
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      changePassFunction(context);
+                      Navigator.of(context).pop();
+                    },
+                    child: Container(
+                      width: 125,
+                      height: 51,
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Confirm',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class ChangeThemeDialog extends StatelessWidget {
+  const ChangeThemeDialog({super.key});
+
   @override
   Widget build(BuildContext context) {
     final isDark = Provider.of<ThemeProvider>(context).isDarkMode;
+
     return Dialog(
       child: Container(
         width: 310,
@@ -354,6 +543,50 @@ class ChangeThemeDialog extends StatelessWidget {
                     ),
                   ),
                 ],
+              ),
+
+              SizedBox(height: 10),
+
+              // System Default
+              GestureDetector(
+                onTap: () {
+                  if (isDark) {
+                    Provider.of<ThemeProvider>(
+                      context,
+                      listen: false,
+                    ).toggleTheme();
+                  }
+                },
+                child: Container(
+                  width: 277,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                    color: Theme.of(context).colorScheme.secondary,
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(15, 0, 15, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'System Default',
+                          style: TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                        SizedBox(),
+                        Icon(
+                          !isDark
+                              ? Icons.radio_button_checked
+                              : Icons.radio_button_off,
+                          size: 17,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
 
               SizedBox(height: 10),
@@ -443,52 +676,6 @@ class ChangeThemeDialog extends StatelessWidget {
                   ),
                 ),
               ),
-
-              SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).pop();
-                    },
-                    child: Container(
-                      width: 125,
-                      height: 51,
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Cancel',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    width: 125,
-                    height: 51,
-                    decoration: BoxDecoration(
-                      color: Colors.green,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Confirm',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
             ],
           ),
         ),
@@ -497,10 +684,10 @@ class ChangeThemeDialog extends StatelessWidget {
   }
 }
 
-class logOutDialog extends StatelessWidget {
+class LogOutDialog extends StatelessWidget {
   final currUser = FirebaseAuth.instance.currentUser;
 
-  logOutDialog({super.key});
+  LogOutDialog({super.key});
 
   // Log Out Function
   void logOutFunction() {

@@ -5,13 +5,20 @@ import 'package:mental_app_support/components/custom_password_textfield.dart';
 import 'package:mental_app_support/components/custom_textfield.dart';
 import 'package:mental_app_support/pages/forgot_password_page.dart';
 
-class LoginPage extends StatelessWidget {
-  // TextFieldListeners
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passController = TextEditingController();
+class LoginPage extends StatefulWidget {
   final void Function() onPressed;
 
-  LoginPage({super.key, required this.onPressed});
+  const LoginPage({super.key, required this.onPressed});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  // TextFieldListeners
+  final TextEditingController _emailController = TextEditingController();
+
+  final TextEditingController _passController = TextEditingController();
 
   // Login Function
   void loginFunction(BuildContext context) async {
@@ -54,7 +61,7 @@ class LoginPage extends StatelessWidget {
 
             // username / email textfield
             CustomTextfield(
-              hintText: 'Email',
+              hintText: 'email@example.com',
               textController: _emailController,
               horzonPadding: 50.0,
             ),
@@ -142,7 +149,7 @@ class LoginPage extends StatelessWidget {
 
             // register now textbutton
             TextButton(
-              onPressed: onPressed,
+              onPressed: widget.onPressed,
               child: Text(
                 'Not Registered?',
                 style: TextStyle(

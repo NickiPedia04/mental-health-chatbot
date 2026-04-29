@@ -54,19 +54,24 @@ class ChangePasswordPage extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                      width: 125,
-                      height: 51,
-                      decoration: BoxDecoration(
-                        color: Color(0xFFFF2020),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Cancel',
-                          style: TextStyle(
-                            color: Color(0xffffffff),
-                            fontWeight: FontWeight.w600,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: Container(
+                        width: 125,
+                        height: 51,
+                        decoration: BoxDecoration(
+                          color: Color(0xFFFF2020),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Cancel',
+                            style: TextStyle(
+                              color: Color(0xffffffff),
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ),

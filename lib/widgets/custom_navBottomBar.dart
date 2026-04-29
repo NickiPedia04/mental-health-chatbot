@@ -14,30 +14,68 @@ class _CustomNavbottombarState extends State<CustomNavbottombar> {
   // Page index
   int _selectedPageIndex = 0;
 
-  void _navBottomBar(int _nextPage) {
-    setState(() {
-      _selectedPageIndex = _nextPage;
-    });
-  }
-
   final List<Widget> _pages = [HomePage(), Chatpage(), SettingsPage()];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages[_selectedPageIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedPageIndex,
-        onTap: _navBottomBar,
-        type: BottomNavigationBarType.fixed,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.chat), label: "Chat"),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: "Settings",
-          ),
-        ],
+      bottomNavigationBar: customNavBar(context),
+    );
+  }
+
+  Container customNavBar(BuildContext context) {
+    return Container(
+      height: 73,
+      decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary),
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 5),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            // Home Page
+            IconButton(
+              enableFeedback: false,
+              highlightColor: Colors.transparent,
+              onPressed: () {
+                setState(() {
+                  _selectedPageIndex = 0;
+                });
+              },
+              icon: _selectedPageIndex == 0
+                  ? Icon(Icons.home_sharp, size: 40)
+                  : Icon(Icons.home_outlined, size: 40),
+            ),
+
+            // Chat Page
+            IconButton(
+              enableFeedback: false,
+              highlightColor: Colors.transparent,
+              onPressed: () {
+                setState(() {
+                  _selectedPageIndex = 1;
+                });
+              },
+              icon: _selectedPageIndex == 1
+                  ? Icon(Icons.chat, size: 40)
+                  : Icon(Icons.chat_outlined, size: 40),
+            ),
+
+            // Settings Page
+            IconButton(
+              enableFeedback: false,
+              highlightColor: Colors.transparent,
+              onPressed: () {
+                setState(() {
+                  _selectedPageIndex = 2;
+                });
+              },
+              icon: _selectedPageIndex == 2
+                  ? Icon(Icons.settings, size: 40)
+                  : Icon(Icons.settings_outlined, size: 40),
+            ),
+          ],
+        ),
       ),
     );
   }
