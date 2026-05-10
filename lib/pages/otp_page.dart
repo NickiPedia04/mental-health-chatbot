@@ -270,18 +270,18 @@ class _OtpPageState extends State<OtpPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  RichText(
-                    text: TextSpan(
-                      text: "Resend Code",
-                      style: TextStyle(fontSize: 11, color: Color(0xFF0084FF)),
-                      children: [
-                        TextSpan(
-                          text: " to ${widget.reqEmail} after XX:XX",
-                          style: TextStyle(fontSize: 11, color: Colors.black),
-                        ),
-                      ],
+                    RichText(
+                      text: TextSpan(
+                        text: "Resend Code",
+                        style: TextStyle(fontSize: 11, color: Color(0xFF0084FF)),
+                        children: [
+                          TextSpan(
+                            text: " to ${widget.reqEmail} after XX:XX",
+                            style: TextStyle(fontSize: 11, color: Colors.black),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
                 ],
               ),
 
