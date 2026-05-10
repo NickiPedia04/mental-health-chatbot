@@ -69,4 +69,96 @@ class ChatServices {
       };
     }).toList();
   }
+
+  // rename sess
+  Future<void> renameSess(String oldSess, String newSess) async {
+    final oldDoc = await _db
+        .collection('users')
+        .doc(uid)
+        .collection('sessions')
+        .doc(oldSess)
+        .get();
+
+    if (!oldDoc.exists) return;
+
+    // create new sess
+    await _db
+        .collection('users')
+        .doc(uid)
+        .collection('sessions')
+        .doc(newSess)
+        .set({'createdAt': oldDoc['createdAt']});
+
+    // get old sess' messages
+    final oldMessages = await _db
+        .collection('users')
+        .doc(uid)
+        .collection('sessions')
+        .doc(oldSess)
+        .collection('messages')
+        .get();
+
+    // copy old messages to new renamed sess
+    for (var messages in oldMessages.docs) {
+      await _db
+          .collection('users')
+          .doc(uid)
+          .collection('sessions')
+          .doc(newSess)
+          .collection('messages')
+          .doc(messages.id)
+          .set(messages.data());
+    }
+
+    // delete old messages
+    for (var messages in oldMessages.docs) {
+      await _db
+          .collection('users')
+          .doc(uid)
+          .collection('sessions')
+          .doc(oldSess)
+          .collection('messages')
+          .doc(messages.id)
+          .delete();
+    }
+
+    // delete old sess
+    await _db
+        .collection('users')
+        .doc(uid)
+        .collection('sessions')
+        .doc(oldSess)
+        .delete();
+  }
+
+  // delete sess
+  Future<void> deleteSess(String sessName) async {
+    final messages = await _db
+        .collection('users')
+        .doc(uid)
+        .collection('sessions')
+        .doc(sessName)
+        .collection('messages')
+        .get();
+
+    // delete messages
+    for (var message in messages.docs) {
+      await _db
+          .collection('users')
+          .doc(uid)
+          .collection('sessions')
+          .doc(sessName)
+          .collection('messages')
+          .doc(message.id)
+          .delete();
+    }
+
+    // delete sess
+    await _db
+        .collection('users')
+        .doc(uid)
+        .collection('sessions')
+        .doc(sessName)
+        .delete();
+  }
 }

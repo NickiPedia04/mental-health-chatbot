@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mental_app_support/components/custom_textfield.dart';
 import 'package:mental_app_support/services/ai_services.dart';
 import 'package:mental_app_support/services/chat_services.dart';
 
@@ -76,7 +77,10 @@ class _ChatpageState extends State<Chatpage> {
         "time": time,
       });
     });
+
     await _chatServices.sendMessages(activateSess, text, false);
+
+    _messageInputController.clear();
 
     setState(() {
       sessions[activateSess]!.insert(0, {
@@ -102,8 +106,6 @@ class _ChatpageState extends State<Chatpage> {
 
     await _chatServices.sendMessages(activateSess, aiReply, true);
 
-    _messageInputController.clear();
-
     FocusScope.of(context).unfocus();
 
     // reply test
@@ -118,6 +120,48 @@ class _ChatpageState extends State<Chatpage> {
     //   await _chatServices.sendMessages(currSess, "I'm here for you", true);
     //   scrollToBottom();
     // });
+  }
+
+  // rename chat sess
+  Future<void> renameSess(String oldSess, String newSess) async {
+    if (newSess.trim().isEmpty) return;
+
+    final oldMessages = sessions[oldSess]!;
+
+    setState(() {
+      sessions.remove(oldSess);
+
+      sessions[newSess] = oldMessages;
+
+      if (currSess == oldSess) {
+        currSess = newSess;
+      }
+    });
+
+    await _chatServices.renameSess(oldSess, newSess);
+  }
+
+  // delete sess
+  Future<void> deleteSess(String sessName) async {
+    setState(() {
+      sessions.remove(sessName);
+
+      if (currSess == sessName) {
+        if (sessions.isNotEmpty) {
+          currSess = sessions.keys.first;
+        } else {
+          sessions['Session 1'] = [];
+
+          currSess = 'Session 1';
+        }
+      }
+    });
+
+    await _chatServices.deleteSess(sessName);
+
+    if (sessions.length == 1 && sessions.containsKey('Session 1')) {
+      await _chatServices.createSess('Session 1');
+    }
   }
 
   // initialize chat
@@ -176,6 +220,8 @@ class _ChatpageState extends State<Chatpage> {
                     currSess: currSess,
                     onSessTap: switchSess,
                     onNewSess: createNewSess,
+                    onRename: renameSess,
+                    onDelete: deleteSess,
                   ),
             Expanded(
               child: Column(
@@ -301,6 +347,8 @@ class ChatSidebarOpen extends StatelessWidget {
   final String currSess;
   final Function(String) onSessTap;
   final VoidCallback onNewSess;
+  final Function(String, String) onRename;
+  final Function(String) onDelete;
 
   const ChatSidebarOpen({
     super.key,
@@ -309,6 +357,8 @@ class ChatSidebarOpen extends StatelessWidget {
     required this.currSess,
     required this.onSessTap,
     required this.onNewSess,
+    required this.onRename,
+    required this.onDelete,
   });
 
   @override
@@ -411,22 +461,64 @@ class ChatSidebarOpen extends StatelessWidget {
                     onTap: () {
                       onSessTap(sessName);
                     },
-                    trailing: PopupMenuButton<String>(
-                      iconColor: sessName == currSess
-                          ? Theme.of(context).colorScheme.inversePrimary
-                          : null,
-                      onSelected: (value) {
-                        if (value == "rename") {
-                          print("Rename Selected");
-                        } else if (value == "delete") {
-                          print("Delete Selected");
-                        }
-                      },
-                      itemBuilder: (context) => [
-                        PopupMenuItem(value: "rename", child: Text('Rename')),
-                        PopupMenuDivider(),
-                        PopupMenuItem(value: "delete", child: Text('Delete')),
-                      ],
+                    trailing: Theme(
+                      data: Theme.of(context).copyWith(
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                      ),
+                      child: PopupMenuButton<String>(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          side: BorderSide(
+                            width: 2,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.inversePrimary.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        elevation: 0,
+                        onSelected: (value) {
+                          // rename sess
+                          if (value == "rename") {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => RenameSessionDialog(
+                                oldSess: sessName,
+                                onRename: onRename,
+                              ),
+                            );
+                            print("Rename Selected");
+                          }
+                          // delete sess
+                          else if (value == "delete") {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) => DeleteDialog(
+                                onDelete: onDelete,
+                                targetedSess: sessName,
+                              ),
+                            );
+                            print("Delete Selected");
+                          }
+                        },
+                        itemBuilder: (context) => [
+                          PopupMenuItem(value: "rename", child: Text('Rename')),
+                          PopupMenuDivider(
+                            thickness: 2,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.inversePrimary.withValues(alpha: 0.2),
+                          ),
+                          PopupMenuItem(value: "delete", child: Text('Delete')),
+                        ],
+                        icon: Icon(Icons.more_vert),
+                        iconColor: sessName == currSess
+                            ? Theme.of(context).colorScheme.inversePrimary
+                            : null,
+                      ),
                     ),
                   ),
                 );
@@ -434,6 +526,213 @@ class ChatSidebarOpen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class RenameSessionDialog extends StatelessWidget {
+  final String oldSess;
+
+  final TextEditingController _renameSessionController =
+      TextEditingController();
+
+  final Function(String, String) onRename;
+
+  RenameSessionDialog({
+    super.key,
+    required this.oldSess,
+    required this.onRename,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        width: 310,
+        height: 170,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Text(
+                    "Rename $oldSess",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.tertiary,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              CustomTextfield(
+                hintText: oldSess,
+                textController: _renameSessionController,
+                horzonPadding: 0,
+              ),
+              SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Container(
+                      width: 125,
+                      height: 51,
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      onRename(oldSess, _renameSessionController.text.trim());
+                      Navigator.of(context).pop();
+                    },
+                    child: Container(
+                      width: 125,
+                      height: 51,
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Confirm',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DeleteDialog extends StatelessWidget {
+  final String targetedSess;
+
+  final Function(String) onDelete;
+
+  const DeleteDialog({
+    super.key,
+    required this.onDelete,
+    required this.targetedSess,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Container(
+        width: 310,
+        height: 200,
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.surface,
+          borderRadius: BorderRadius.circular(5),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          child: Column(
+            children: [
+              Text(
+                "Delete entry?",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 21,
+                  color: Colors.red,
+                ),
+              ),
+
+              SizedBox(height: 10),
+
+              Text(
+                "Confirming will permanently delete the selected entry.\nThis action cannot be undone.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16),
+              ),
+
+              SizedBox(height: 10),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Container(
+                      width: 125,
+                      height: 51,
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      onDelete(targetedSess);
+                      Navigator.of(context).pop();
+                    },
+                    child: Container(
+                      width: 125,
+                      height: 51,
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Confirm',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
