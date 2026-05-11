@@ -1,7 +1,9 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mental_app_support/auth/auth_service.dart';
-import 'package:mental_app_support/pages/change_password_page.dart';
 
 class OtpPage extends StatefulWidget {
   final String reqEmail;
@@ -21,6 +23,46 @@ class _OtpPageState extends State<OtpPage> {
     return pin.map((p) => p.text).join();
   }
 
+  int resendTimer = 300;
+
+  Timer? timer;
+
+  void startTimer() {
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (resendTimer > 0) {
+        setState(() {
+          resendTimer--;
+        });
+      } else {
+        timer.cancel();
+      }
+    });
+  }
+
+  String get timerText {
+    final minutes = (resendTimer ~/ 60).toString().padLeft(2, '0');
+    final seconds = (resendTimer % 60).toString().padLeft(2, '0');
+    return "$minutes:$seconds";
+  }
+
+  String generateOTP() {
+    final random = Random();
+    return (10000 + random.nextInt(90000)).toString();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    startTimer();
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,13 +77,18 @@ class _OtpPageState extends State<OtpPage> {
               width: 1.2,
             ),
             borderRadius: BorderRadius.circular(5),
+            color: Theme.of(context).colorScheme.inversePrimary,
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 'OTP Verification',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
 
               SizedBox(height: 10),
@@ -270,18 +317,58 @@ class _OtpPageState extends State<OtpPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                    RichText(
-                      text: TextSpan(
-                        text: "Resend Code",
-                        style: TextStyle(fontSize: 11, color: Color(0xFF0084FF)),
-                        children: [
-                          TextSpan(
-                            text: " to ${widget.reqEmail} after XX:XX",
-                            style: TextStyle(fontSize: 11, color: Colors.black),
-                          ),
-                        ],
+                  GestureDetector(
+                    onTap: resendTimer == 0
+                        ? () async {
+                            setState(() {
+                              resendTimer = 300;
+                            });
+
+                            timer?.cancel();
+
+                            startTimer();
+
+                            for (var p in pin) {
+                              p.clear();
+                            }
+
+                            final regeneratedOTP = generateOTP();
+
+                            await AuthService().storeOTP(
+                              widget.reqEmail,
+                              regeneratedOTP,
+                            );
+
+                            final username = await AuthService()
+                                .getUsernameFromEmail(widget.reqEmail);
+
+                            final expireTime = DateTime.now().add(
+                              Duration(minutes: 5),
+                            );
+
+                            await AuthService().sendEmail(
+                              userName: username,
+                              userEmail: widget.reqEmail,
+                              otp: regeneratedOTP,
+                              endTime:
+                                  "${expireTime.hour.toString().padLeft(2, '0')}:${expireTime.minute.toString().padLeft(2, '0')}",
+                            );
+                          }
+                        : null,
+                    child: Text(
+                      'Resend Code ',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: resendTimer == 0
+                            ? Color(0xFF0084FF)
+                            : Colors.black.withValues(alpha: 0.4),
                       ),
                     ),
+                  ),
+                  Text(
+                    'to ${widget.reqEmail} after $timerText',
+                    style: TextStyle(fontSize: 11, color: Colors.black),
+                  ),
                 ],
               ),
 
@@ -387,7 +474,11 @@ class ResetPasswordLinkSentDialog extends StatelessWidget {
               Text(
                 "Password reset link has been sent to your email",
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black,
+                ),
               ),
 
               SizedBox(height: 10),

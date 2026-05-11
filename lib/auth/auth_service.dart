@@ -1,8 +1,5 @@
 import 'dart:convert';
-
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
@@ -147,7 +144,7 @@ class AuthService {
   }) async {
     final serviceId = 'service_np3dq55';
     final templateId = 'template_2a5o4of';
-    final userId = 'user_HWjDsRXcC7YMOzb9N';
+    final userId = 'HWjDsRXcC7YMOzb9N';
 
     final url = Uri.parse('https://api.emailjs.com/api/v1.0/email/send');
     final response = await http.post(
@@ -157,10 +154,10 @@ class AuthService {
         'Content-Type': 'application/json',
       },
       body: json.encode({
-        'service-id': serviceId,
-        'template-id': templateId,
-        'user-id': userId,
-        'template-params': {
+        'service_id': serviceId,
+        'template_id': templateId,
+        'user_id': userId,
+        'template_params': {
           'user_name': userName,
           'user_email': userEmail,
           'otp': otp,
@@ -172,8 +169,23 @@ class AuthService {
     if (response.statusCode == 200) {
       print('Email sent successfully');
     } else {
-      print('Failed: ${response.body}');
+      print('Failed to send email: ${response.body}');
     }
+  }
+
+  // get username from email
+  Future<String> getUsernameFromEmail(String email) async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('user-details')
+        .where('email', isEqualTo: email)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      return snapshot.docs.first['username'];
+    }
+
+    return "User";
   }
 
   // verify otp

@@ -43,8 +43,16 @@ class _CustomNavbottombarState extends State<CustomNavbottombar> {
                 });
               },
               icon: _selectedPageIndex == 0
-                  ? Icon(Icons.home_sharp, size: 40)
-                  : Icon(Icons.home_outlined, size: 40),
+                  ? Icon(
+                      Icons.home_sharp,
+                      size: 40,
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                    )
+                  : Icon(
+                      Icons.home_outlined,
+                      size: 40,
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                    ),
             ),
 
             // Chat Page
@@ -57,8 +65,16 @@ class _CustomNavbottombarState extends State<CustomNavbottombar> {
                 });
               },
               icon: _selectedPageIndex == 1
-                  ? Icon(Icons.chat, size: 40)
-                  : Icon(Icons.chat_outlined, size: 40),
+                  ? Icon(
+                      Icons.chat,
+                      size: 40,
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                    )
+                  : Icon(
+                      Icons.chat_outlined,
+                      size: 40,
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                    ),
             ),
 
             // Settings Page
@@ -71,8 +87,16 @@ class _CustomNavbottombarState extends State<CustomNavbottombar> {
                 });
               },
               icon: _selectedPageIndex == 2
-                  ? Icon(Icons.settings, size: 40)
-                  : Icon(Icons.settings_outlined, size: 40),
+                  ? Icon(
+                      Icons.settings,
+                      size: 40,
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                    )
+                  : Icon(
+                      Icons.settings_outlined,
+                      size: 40,
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                    ),
             ),
           ],
         ),

@@ -60,11 +60,7 @@ class _RegisterPageState extends State<RegisterPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // logo
-            Icon(
-              Icons.message,
-              size: 60,
-              color: Theme.of(context).colorScheme.primary,
-            ),
+            Image.asset('assets/healment_icon.png', width: 60, height: 60),
 
             SizedBox(height: 30),
 

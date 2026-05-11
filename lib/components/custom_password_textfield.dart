@@ -29,7 +29,7 @@ class _CustomPasswordTextfield extends State<CustomPasswordTextfield> {
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(5),
             borderSide: BorderSide(
-              color: Theme.of(context).colorScheme.secondary,
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
           focusedBorder: OutlineInputBorder(
@@ -38,7 +38,7 @@ class _CustomPasswordTextfield extends State<CustomPasswordTextfield> {
               color: Theme.of(context).colorScheme.primary,
             ),
           ),
-          fillColor: Theme.of(context).colorScheme.secondary,
+          fillColor: Theme.of(context).colorScheme.primary,
           filled: true,
           hintText: widget.hintText,
           hintStyle: TextStyle(

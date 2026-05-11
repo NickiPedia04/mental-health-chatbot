@@ -12,6 +12,7 @@ class ForgotPasswordPage extends StatelessWidget {
   final authServ = AuthService();
   final user = FirebaseAuth.instance.currentUser;
   final db = FirebaseFirestore.instance.collection('user-details').doc();
+
   ForgotPasswordPage({super.key});
 
   String generateOTP() {
@@ -52,13 +53,18 @@ class ForgotPasswordPage extends StatelessWidget {
               width: 1,
             ),
             borderRadius: BorderRadius.circular(5),
+            color: Colors.white,
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
                 'Forgot Password',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
 
               SizedBox(height: 10),
@@ -105,18 +111,24 @@ class ForgotPasswordPage extends StatelessWidget {
                         );
 
                         if (await isEmailExist) {
+                          final otp = generateOTP();
+                          AuthService().storeOTP(_emailController.text, otp);
+
+                          final username = await AuthService()
+                              .getUsernameFromEmail(_emailController.text);
+                          final endtime = DateTime.now().add(
+                            const Duration(minutes: 5),
+                          );
+                          AuthService().sendEmail(
+                            userName: username,
+                            userEmail: _emailController.text,
+                            otp: otp,
+                            endTime:
+                                "${endtime.hour.toString().padLeft(2, '0')}:${endtime.minute.toString().padLeft(2, '0')}",
+                          );
+
                           // ignore: use_build_context_synchronously
                           goToOTP(context);
-                          AuthService().storeOTP(
-                            _emailController.text,
-                            generateOTP(),
-                          );
-                          // AuthService().sendEmail(
-                          //   userName: userName,
-                          //   userEmail: _emailController.text,
-                          //   otp: generateOTP(),
-                          //   endTime: endTime
-                          // )
                         } else {
                           showDialog(
                             // ignore: use_build_context_synchronously

@@ -36,14 +36,20 @@ class _SettingsPageState extends State<SettingsPage> {
                 child: Center(
                   child: Column(
                     children: [
-                      Container(
-                        height: 100,
-                        width: 100,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary,
-                          shape: BoxShape.circle,
-                        ),
+                      // Container(
+                      //   height: 100,
+                      //   width: 100,
+                      //   decoration: BoxDecoration(
+                      //     color: Theme.of(context).colorScheme.primary,
+                      //     shape: BoxShape.circle,
+                      //   ),
+                      // ),
+                      Image.asset(
+                        'assets/healment_icon.png',
+                        width: 60,
+                        height: 60,
                       ),
+                      SizedBox(height: 10),
                       Text(userDetails['username']),
                       Text(userDetails['email']),
 
@@ -74,9 +80,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 height: 50,
                                 width: 280,
                                 decoration: BoxDecoration(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.secondary,
+                                  color: Theme.of(context).colorScheme.primary,
                                   borderRadius: BorderRadius.circular(5),
                                 ),
                                 child: Padding(
@@ -118,9 +122,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 height: 50,
                                 width: 280,
                                 decoration: BoxDecoration(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.secondary,
+                                  color: Theme.of(context).colorScheme.primary,
                                   borderRadius: BorderRadius.circular(5),
                                 ),
                                 child: Padding(
@@ -170,9 +172,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 height: 50,
                                 width: 280,
                                 decoration: BoxDecoration(
-                                  color: Theme.of(
-                                    context,
-                                  ).colorScheme.secondary,
+                                  color: Theme.of(context).colorScheme.primary,
                                   borderRadius: BorderRadius.circular(5),
                                 ),
                                 child: Padding(
@@ -519,8 +519,9 @@ class ChangeThemeDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Provider.of<ThemeProvider>(context).isDarkMode;
+    // final isDark = Provider.of<ThemeProvider>(context).isDarkMode;
 
+    final currTheme = Provider.of<ThemeProvider>(context).themeMode;
     return Dialog(
       child: Container(
         width: 310,
@@ -550,21 +551,19 @@ class ChangeThemeDialog extends StatelessWidget {
               // System Default
               GestureDetector(
                 onTap: () {
-                  if (isDark) {
-                    Provider.of<ThemeProvider>(
-                      context,
-                      listen: false,
-                    ).toggleTheme();
-                  }
+                  Provider.of<ThemeProvider>(
+                    context,
+                    listen: false,
+                  ).setThemeMode(ThemeMode.system);
                 },
                 child: Container(
                   width: 277,
                   height: 50,
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.secondary,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
-                    color: Theme.of(context).colorScheme.secondary,
+                    color: Theme.of(context).colorScheme.primary,
                     borderRadius: BorderRadius.circular(5),
                   ),
                   child: Padding(
@@ -578,7 +577,7 @@ class ChangeThemeDialog extends StatelessWidget {
                         ),
                         SizedBox(),
                         Icon(
-                          !isDark
+                          currTheme == ThemeMode.system
                               ? Icons.radio_button_checked
                               : Icons.radio_button_off,
                           size: 17,
@@ -594,21 +593,19 @@ class ChangeThemeDialog extends StatelessWidget {
               // Light Mode
               GestureDetector(
                 onTap: () {
-                  if (isDark) {
-                    Provider.of<ThemeProvider>(
-                      context,
-                      listen: false,
-                    ).toggleTheme();
-                  }
+                  Provider.of<ThemeProvider>(
+                    context,
+                    listen: false,
+                  ).setThemeMode(ThemeMode.light);
                 },
                 child: Container(
                   width: 277,
                   height: 50,
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.secondary,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
-                    color: Theme.of(context).colorScheme.secondary,
+                    color: Theme.of(context).colorScheme.primary,
                     borderRadius: BorderRadius.circular(5),
                   ),
                   child: Padding(
@@ -622,7 +619,7 @@ class ChangeThemeDialog extends StatelessWidget {
                         ),
                         SizedBox(),
                         Icon(
-                          !isDark
+                          currTheme == ThemeMode.light
                               ? Icons.radio_button_checked
                               : Icons.radio_button_off,
                           size: 17,
@@ -638,21 +635,19 @@ class ChangeThemeDialog extends StatelessWidget {
               // Dark Mode
               GestureDetector(
                 onTap: () {
-                  if (!isDark) {
-                    Provider.of<ThemeProvider>(
-                      context,
-                      listen: false,
-                    ).toggleTheme();
-                  }
+                  Provider.of<ThemeProvider>(
+                    context,
+                    listen: false,
+                  ).setThemeMode(ThemeMode.dark);
                 },
                 child: Container(
                   width: 277,
                   height: 50,
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.secondary,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
-                    color: Theme.of(context).colorScheme.secondary,
+                    color: Theme.of(context).colorScheme.primary,
                     borderRadius: BorderRadius.circular(5),
                   ),
                   child: Padding(
@@ -666,7 +661,7 @@ class ChangeThemeDialog extends StatelessWidget {
                         ),
                         SizedBox(),
                         Icon(
-                          isDark
+                          currTheme == ThemeMode.dark
                               ? Icons.radio_button_checked
                               : Icons.radio_button_off,
                           size: 17,
@@ -703,7 +698,7 @@ class LogOutDialog extends StatelessWidget {
         width: 310,
         height: 154,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(5),
         ),
         child: Padding(

@@ -61,6 +61,18 @@ class _ChatpageState extends State<Chatpage> {
     );
   }
 
+  String refinedAiReponse(String text) {
+    return text
+        .replaceAll('**', '')
+        .replaceAll('*', '')
+        .replaceAll('#', '')
+        .replaceAll('```', '')
+        .replaceAll('`', '')
+        .replaceAll('>', '')
+        .replaceAll(RegExp(r'\n{3,}'), '\n\n')
+        .trim();
+  }
+
   Future<void> sendMessage() async {
     final activateSess = currSess;
 
@@ -91,40 +103,47 @@ class _ChatpageState extends State<Chatpage> {
     });
 
     scrollToBottom();
+    try {
+      final rawAiReply = await _aiService.sendMessage(text);
 
-    final aiReply = await _aiService.sendMessage(text);
+      final refinedAiReply = refinedAiReponse(rawAiReply);
 
-    setState(() {
-      sessions[activateSess]!.removeAt(0);
+      setState(() {
+        sessions[activateSess]!.removeAt(0);
 
-      sessions[activateSess]!.insert(0, {
-        'text': aiReply,
-        'isReceiver': true,
-        'time': getCurrTime(),
+        sessions[activateSess]!.insert(0, {
+          'text': refinedAiReply,
+          'isReceiver': true,
+          'time': getCurrTime(),
+        });
       });
-    });
 
-    await _chatServices.sendMessages(activateSess, aiReply, true);
+      await _chatServices.sendMessages(activateSess, refinedAiReply, true);
+    } catch (e) {
+      final rawAiReply = 'Sorry, something went wrong';
+      final refinedAiReply = refinedAiReponse(rawAiReply);
 
+      setState(() {
+        sessions[activateSess]!.removeAt(0);
+        sessions[activateSess]!.insert(0, {
+          'text': refinedAiReply,
+          'isReceiver': true,
+          'time': getCurrTime(),
+        });
+      });
+
+      await _chatServices.sendMessages(activateSess, refinedAiReply, true);
+    }
+
+    // ignore: use_build_context_synchronously
     FocusScope.of(context).unfocus();
-
-    // reply test
-    // Future.delayed(const Duration(milliseconds: 500), () async {
-    //   setState(() {
-    //     sessions[currSess]!.insert(0, {
-    //       "text": "I'm here for you",
-    //       "isReceiver": true,
-    //       "time": getCurrTime(),
-    //     });
-    //   });
-    //   await _chatServices.sendMessages(currSess, "I'm here for you", true);
-    //   scrollToBottom();
-    // });
   }
 
   // rename chat sess
   Future<void> renameSess(String oldSess, String newSess) async {
     if (newSess.trim().isEmpty) return;
+
+    if (sessions.containsKey(newSess)) return;
 
     final oldMessages = sessions[oldSess]!;
 
@@ -213,7 +232,7 @@ class _ChatpageState extends State<Chatpage> {
         body: Row(
           children: [
             isSidebarClose
-                ? ChatSidebarClose(onToggle: onToggle)
+                ? ChatSidebarClose(onToggle: onToggle, onNewSess: createNewSess)
                 : ChatSidebarOpen(
                     onToggle: onToggle,
                     sessions: sessions,
@@ -275,6 +294,7 @@ class _ChatpageState extends State<Chatpage> {
                           Expanded(
                             child: TextField(
                               controller: _messageInputController,
+                              onSubmitted: (_) => sendMessage(),
                               decoration: InputDecoration(
                                 hintText: "Enter message here...",
                                 hintStyle: TextStyle(
@@ -313,8 +333,13 @@ class _ChatpageState extends State<Chatpage> {
 
 class ChatSidebarClose extends StatelessWidget {
   final VoidCallback onToggle;
+  final VoidCallback onNewSess;
 
-  const ChatSidebarClose({super.key, required this.onToggle});
+  const ChatSidebarClose({
+    super.key,
+    required this.onToggle,
+    required this.onNewSess,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -332,7 +357,7 @@ class ChatSidebarClose extends StatelessWidget {
           ),
           SizedBox(height: 10),
           IconButton(
-            onPressed: () {},
+            onPressed: onNewSess,
             icon: Icon(Icons.add_circle_outline_outlined),
           ),
         ],

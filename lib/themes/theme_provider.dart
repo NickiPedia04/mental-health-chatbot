@@ -1,24 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:mental_app_support/themes/dark_mode.dart';
-import 'package:mental_app_support/themes/light_mode.dart';
-
 class ThemeProvider extends ChangeNotifier {
-  ThemeData _themeData = lightMode;
+  ThemeMode _themeMode = ThemeMode.system;
 
-  ThemeData get themeData => _themeData;
+  ThemeMode get themeMode => _themeMode;
 
-  bool get isDarkMode => _themeData == darkMode;
-
-  set themeData(ThemeData themeData) {
-    _themeData = themeData;
+  void setThemeMode(ThemeMode mode) {
+    _themeMode = mode;
     notifyListeners();
-  }
-
-  void toggleTheme() {
-    if (_themeData == lightMode) {
-      themeData = darkMode;
-    } else {
-      themeData = lightMode;
-    }
   }
 }
