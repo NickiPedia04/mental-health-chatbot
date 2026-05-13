@@ -77,7 +77,7 @@ class _OtpPageState extends State<OtpPage> {
               width: 1.2,
             ),
             borderRadius: BorderRadius.circular(5),
-            color: Theme.of(context).colorScheme.inversePrimary,
+            color: Colors.white,
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

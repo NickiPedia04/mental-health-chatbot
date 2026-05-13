@@ -84,19 +84,10 @@ class _NotePageState extends State<NotePage> {
   }
 
   void saveNote() async {
-    final noteServ = noteService();
 
-    if (widget.docId == null) {
-      // create new note
-      await noteServ.addNote(headerController.text, contentController.text);
-    } else {
-      // update current note
-      await noteServ.updateNote(
-        widget.docId!,
-        headerController.text,
-        contentController.text,
-      );
-    }
+    await autoSave();
+
+    if (!mounted) return;
 
     // ignore: use_build_context_synchronously
     Navigator.pop(context);
